@@ -5,6 +5,8 @@ import json
 from bson import json_util
 from models_user import create_new_user, get_users, login_user, save_push_token_for_notifications
 from models_message import add_new_message, get_chat_messages, read_message
+from django.views.decorators.csrf import csrf_exempt
+
 
 def login(request):
     if request.method == 'GET':
@@ -74,6 +76,7 @@ def contact_list(request):
             return HttpResponse(json_util.dumps(result), status=status_code)
     return HttpResponseForbidden()
 
+@csrf_exempt
 def send_message(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -121,6 +124,7 @@ def retrieve_chat(request):
                 'message': 'Mandatory Param is missing.'
             }), status=400)
         result, status_code = get_chat_messages(calling_id, last_sync_time)
+        print result
         return HttpResponse(json_util.dumps(result), status=status_code)
 
 def read_messages(request):
@@ -135,6 +139,7 @@ def read_messages(request):
         result, status_code = read_message(user_number, contact_number)
         return HttpResponse(json_util.dumps(result), status=status_code)
 
+@csrf_exempt
 def save_push_token(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -149,5 +154,6 @@ def save_push_token(request):
                 'message': 'User Number is missing.'
             }), status=400)
         result, status_code = save_push_token_for_notifications(user_number, push_token)
+        # import pdb ; pdb.set_trace()
         return HttpResponse(json_util.dumps(result), status=status_code)
     return HttpResponseForbidden()

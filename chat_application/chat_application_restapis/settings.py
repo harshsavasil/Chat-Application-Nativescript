@@ -13,7 +13,9 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 import pymongo
 import urllib
-
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = 'django://'
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -40,7 +42,7 @@ MONGO_DB_NAME = 'chat_application'
 #     settings.MONGO_HOST + ':' + str(settings.MONGO_PORT) + '/' + settings.MONGO_DB_NAME
 uri_string = 'mongodb://'+ MONGO_HOST + ':' + str(MONGO_PORT) + '/'+ MONGO_DB_NAME
 THE_MONGO_CLIENT = pymongo.MongoClient(uri_string, connect=False)
-
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -51,14 +53,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_mongoengine',
-    'django_socketio'
+    'django_socketio',
+    'djcelery',
+    'kombu.transport.django',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
